@@ -256,20 +256,24 @@ void setup_microenvironment( void )
 	
 	// add other substrates besides oxygen
 	microenvironment.add_density( "glu", "dimensionless" ); 
-	microenvironment.diffusion_coefficients[1] = 1e3; 
-	microenvironment.decay_rates[1] = .1; 	
+	microenvironment.diffusion_coefficients[1] = 0; 
+	microenvironment.decay_rates[1] = 0; 	
 	
 	microenvironment.add_density( "lac", "dimensionless" ); 
-	microenvironment.diffusion_coefficients[2] = 1e3; 
-	microenvironment.decay_rates[2] = 0.15625; 	
+	microenvironment.diffusion_coefficients[2] = 0; 
+	microenvironment.decay_rates[2] = 0; 	
 	
 	// let BioFVM use oxygen as the default 
 	
 	default_microenvironment_options.use_oxygen_as_first_field = true; 
 
 	// set Dirichlet conditions 
+	std::vector<double> bc_vector( 3 , 42  ); // 21% o2
+	bc_vector[1] = 0.0; 
+	bc_vector[2] = 1.0; 
 	
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
+	// default_microenvironment_options.outer_Dirichlet_conditions = true;
+	default_microenvironment_options.outer_Dirichlet_conditions = false;
 	default_microenvironment_options.Dirichlet_condition_vector[0] = 38; // physioxic conditions 
 	default_microenvironment_options.Dirichlet_condition_vector[1] = 0; 
 	default_microenvironment_options.Dirichlet_condition_vector[2] = 1; 
@@ -279,8 +283,25 @@ void setup_microenvironment( void )
 	
 	// set initial conditions 
 	default_microenvironment_options.initial_condition_vector = { 38.0 , 0.0, 1.0 }; 
+
+
+	default_microenvironment_options.track_internalized_substrates_in_each_agent = true; 
 			
 	initialize_microenvironment(); 	
+
+	microenvironment.decay_rates[0] = 0; 	 // no decay
+	microenvironment.diffusion_coefficients[0] = 0; 	// no diffusion
+
+	microenvironment.decay_rates[1] = 0; 	 // no decay
+	microenvironment.diffusion_coefficients[1] = 0; 	// no diffusion
+
+	double factor = 1.0;
+	for( unsigned int n=0; n < microenvironment.number_of_voxels() ; n++ )
+	{
+		factor = 1.0 - ((n%20)/20.);
+		bc_vector[0] = factor*38.;
+		microenvironment(n) = bc_vector; 
+	}	
 
 	return; 
 }	
@@ -333,7 +354,6 @@ void setup_microenvironment_OLD( void )
 	
 	// set the oxygen decay rate back to zero 
 	microenvironment.decay_rates[0] = 0; 	 // no decay
-
 	microenvironment.diffusion_coefficients[0] = 0; 	// no diffusion
 		
 	// now, let's set all the substrates to the bc_vector value 
@@ -368,7 +388,10 @@ void setup_tissue( void )
 	double delta = 4.0;
 	
 	pC = create_cell(); 
-	pC->assign_position( xmin + delta, 0.0, 0.0 ); 
+	pC->assign_position( -50., 50.0, 0.0 ); 
+
+	pC = create_cell(); 
+	pC->assign_position( 50., -50.0, 0.0 ); 
 	// pC->flag_for_division();
 
 	return; 
