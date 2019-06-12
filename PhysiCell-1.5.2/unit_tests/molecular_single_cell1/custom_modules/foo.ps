@@ -1,0 +1,120 @@
+%!PS-Adobe-
+%%DocumentFonts: Courier Courier-Bold
+% PSP prologue file, version 1.0
+%
+% Copyright (c) 1989 Eric J. Kostelich
+%
+save
+/PSPstart {} def
+/p {	3 1 roll
+	Linespacing mul Textoffset exch sub
+	exch Textwidth Leftmargin add mul Leftmargin add
+	exch moveto show 
+} def
+
+/Setbold { /Courier-Bold findfont Boldsize scalefont setfont } def
+/SF { /Courier findfont Pointsize scalefont setfont } def
+%
+% (string) H  - for placing boldface titles
+%
+/H { Setbold Leftmargin Titleoffset moveto show SF } def
+%
+%  Normal mode - use titles, 54 lines/page
+%
+/Usual {/Leftmargin 66 def  /Textoffset 708 def /Titleoffset 738 def
+	/Boldsize 12 def  /Pointsize 10 def /Linespacing 12 def
+	/Textwidth 480 def /Rotatemode false def
+} def
+%
+%  Plain mode - no titles, 66 lines/page
+%
+/Plain {/Leftmargin 72 def  /Textoffset 756 def
+	/Boldsize 14 def  /Pointsize 9 def /Linespacing 11 def
+	/Textwidth 480 def /Rotatemode false def
+} def
+%
+% Rotated, two-column mode - 65 lines/column
+%
+/Rotated { /Rotatemode true def } def
+/Rotatepage { 612 0 translate 90 rotate
+	/Leftmargin 36 def /Textoffset 550 def /Titleoffset 568 def
+	/Boldsize 12 def  /Pointsize 7 def  /Linespacing 8 def
+	/Textwidth 336 def
+} def
+/Startpage { Rotatemode {Rotatepage} if SF } def
+/Endpage {showpage} def
+/PSPend {restore} def
+%%EndPrologue
+Rotated
+%%Page 1 1
+Startpage
+(...ular_single_cell/custom_modules/Toy_Model_for_PhysiCell.c      Fri Jun  7 11:34:43 2019
+       1)H
+0 0(#ifdef SIZE_DEFINITIONS)p
+0 1(#define N_METABS 4)p
+0 2(#define N_ODE_METABS 0)p
+0 3(#define N_INDEP_METABS 3)p
+0 4(#define N_COMPARTMENTS 1)p
+0 5(#define N_GLOBAL_PARAMS 7)p
+0 6(#define N_KIN_PARAMS 0)p
+0 7(#define N_REACTIONS 3)p
+0 9(#define N_ARRAY_SIZE_P  8       // number of parameters)p
+0 10(#define N_ARRAY_SIZE_X  3       // number of initials)p
+0 11(#define N_ARRAY_SIZE_Y  1       // number of assigned elements)p
+0 12(#define N_ARRAY_SIZE_XC 3       // number of x concentration)p
+0 13(#define N_ARRAY_SIZE_PC 0       // number of p concentration)p
+0 14(#define N_ARRAY_SIZE_YC 1       // number of y concentration)p
+0 15(#define N_ARRAY_SIZE_DX 3       // number of ODEs)p
+0 16(#define N_ARRAY_SIZE_CT 1       // number of conserved totals)p
+0 18(#endif // SIZE_DEFINITIONS)p
+0 20(#ifdef TIME)p
+0 21(#define T  <set here a user name for the time variable>)p
+0 22(#endif // TIME)p
+0 24(#ifdef NAME_ARRAYS)p
+0 25(const char* p_names[] = {"Cell", "Alpha", "Beta", "Gamma", "phenotype.cycle.tran)p
+0 26(sition_rate_0_1", "phenotype.death.rate_0", "E_cyc_threshold", "E_death_threshol)p
+0 27(d",  "" };)p
+0 28(const char* x_names[] = {"Energy", "Glucose", "Hydrogen",  "" };)p
+0 29(const char* y_names[] = {"Oxygen",  "" };)p
+0 30(const char* xc_names[] = {"Energy", "Glucose", "Hydrogen",  "" };)p
+0 31(const char* pc_names[] = { "" };)p
+0 32(const char* yc_names[] = {"Oxygen",  "" };)p
+0 33(const char* dx_names[] = {"ODE Energy", "ODE Glucose", "ODE Hydrogen",  "" };)p
+0 34(const char* ct_names[] = {"CT Oxygen",  "" };)p
+0 35(#endif // NAME_ARRAYS)p
+0 37(#ifdef INITIAL)p
+0 38(x[0] = 5;       //metabolite 'Energy': reactions)p
+0 39(x[1] = 10;      //metabolite 'Glucose': reactions)p
+0 40(x[2] = 0;       //metabolite 'Hydrogen': reactions)p
+0 41(#endif /* INITIAL */)p
+0 43(#ifdef FIXED)p
+0 44(ct[0] = 0;      //ct[0] conserved total for 'Oxygen')p
+0 45(p[0] = 1;       //compartment 'Cell':fixed)p
+0 46(p[1] = 2;       //global quantity 'Alpha':fixed)p
+0 47(p[2] = 1;       //global quantity 'Beta':fixed)p
+0 48(p[3] = 0.3;     //global quantity 'Gamma':fixed)p
+0 49(p[4] = 0;       //global quantity 'phenotype.cycle.transition_rate_0_1':fixed)p
+0 50(p[5] = 0;       //global quantity 'phenotype.death.rate_0':fixed)p
+0 51(p[6] = 10;      //global quantity 'E_cyc_threshold':fixed)p
+0 52(p[7] = 3;       //global quantity 'E_death_threshold':fixed)p
+0 53(#endif /* FIXED */)p
+0 55(#ifdef ASSIGNMENT)p
+0 56(y[0] = ct[0]+x[1]+1*x[2];       //metabolite 'Oxygen': reactions)p
+0 57(x_c[0] = x[0]/p[0];     //concentration of metabolite 'Energy': reactions)p
+0 58(x_c[1] = x[1]/p[0];     //concentration of metabolite 'Glucose': reactions)p
+0 59(x_c[2] = x[2]/p[0];     //concentration of metabolite 'Hydrogen': reactions)p
+0 60(y_c[0] = y[0]/p[0];     //concentration of metabolite 'Oxygen': reactions)p
+0 61(#endif /* ASSIGNMENT */)p
+0 63(#ifdef FUNCTIONS_HEADERS)p
+0 64(#endif /* FUNCTIONS_HEADERS */)p
+1 1(#ifdef FUNCTIONS)p
+1 2(#endif /* FUNCTIONS */)p
+1 4(#ifdef ODEs)p
+1 5(dx[0] = \(p[1] * y_c[0] * x_c[1]\) *p[0]+\(p[2] * x_c[1]\) *p[0]-\(p[3] * x_c[0]\) *p[)p
+1 6(0];)p
+1 7(dx[1] = -\(p[1] * y_c[0] * x_c[1]\) *p[0]-\(p[2] * x_c[1]\) *p[0];)p
+1 8(dx[2] = \(p[2] * x_c[1]\) *p[0];)p
+1 9(#endif /* ODEs */)p
+Endpage
+%%Trailer
+PSPend
