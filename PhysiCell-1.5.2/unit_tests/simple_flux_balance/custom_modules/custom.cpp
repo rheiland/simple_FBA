@@ -110,13 +110,14 @@ void create_cell_types( void )
 	// cell_defaults.phenotype.secretion.uptake_rates[0] = 1; 
 	cell_defaults.phenotype.secretion.saturation_densities[0] = 1; 
 
-	// enable motility 
-	cell_defaults.phenotype.motility.is_motile = true; 
+	// disable motility for now
+	cell_defaults.phenotype.motility.is_motile = false; 
+	// cell_defaults.phenotype.motility.is_motile = true; 
 	// motile_cell.phenotype.motility.persistence_time = parameters.doubles( "motile_cell_persistence_time" ); // 15.0; 
-	cell_defaults.phenotype.motility.migration_speed = parameters.doubles( "motile_cell_migration_speed" ); // 0.25 micron/minute 
-	cell_defaults.phenotype.motility.migration_bias = 0.0;// completely random 
-	cell_defaults.phenotype.motility.migration_bias = 1.0;// completely biased 
-	cell_defaults.phenotype.motility.migration_bias_direction[0] = 1.0;
+	// cell_defaults.phenotype.motility.migration_speed = parameters.doubles( "motile_cell_migration_speed" ); // 0.25 micron/minute 
+	// cell_defaults.phenotype.motility.migration_bias = 0.0;// completely random 
+	// cell_defaults.phenotype.motility.migration_bias = 1.0;// completely biased 
+	// cell_defaults.phenotype.motility.migration_bias_direction[0] = 1.0;
 	
 	// set the default cell type to no phenotype updates 
 	cell_defaults.functions.update_phenotype = NULL; 
@@ -235,6 +236,57 @@ void create_cell_types( void )
 
 void setup_microenvironment( void )
 {
+	// set domain parameters
+	
+/*
+	// in the XML now 
+	default_microenvironment_options.X_range = {-750, 750}; 
+	default_microenvironment_options.Y_range = {-750, 750}; 
+	// default_microenvironment_options.Z_range = {-750, 750}; 
+*/
+	if( default_microenvironment_options.simulate_2D == false )
+	{
+		std::cout << "WARNING: overriding from 3-D to 2-D" << std::endl; 
+		default_microenvironment_options.simulate_2D = true; 
+	}
+	
+	// gradients are needed for this example 
+	
+	default_microenvironment_options.calculate_gradients = true; 
+	
+	// add other substrates besides oxygen
+	microenvironment.add_density( "glu", "dimensionless" ); 
+	microenvironment.diffusion_coefficients[1] = 1e3; 
+	microenvironment.decay_rates[1] = .1; 	
+	
+	microenvironment.add_density( "lac", "dimensionless" ); 
+	microenvironment.diffusion_coefficients[2] = 1e3; 
+	microenvironment.decay_rates[2] = 0.15625; 	
+	
+	// let BioFVM use oxygen as the default 
+	
+	default_microenvironment_options.use_oxygen_as_first_field = true; 
+
+	// set Dirichlet conditions 
+	
+	default_microenvironment_options.outer_Dirichlet_conditions = true;
+	default_microenvironment_options.Dirichlet_condition_vector[0] = 38; // physioxic conditions 
+	default_microenvironment_options.Dirichlet_condition_vector[1] = 0; 
+	default_microenvironment_options.Dirichlet_condition_vector[2] = 1; 
+	
+	default_microenvironment_options.Dirichlet_activation_vector[1] = false;  
+	default_microenvironment_options.Dirichlet_activation_vector[2] = false;  
+	
+	// set initial conditions 
+	default_microenvironment_options.initial_condition_vector = { 38.0 , 0.0, 1.0 }; 
+			
+	initialize_microenvironment(); 	
+
+	return; 
+}	
+
+void setup_microenvironment_OLD( void )
+{
 	// set domain parameters 
 	
 /* now this is in XML 
@@ -254,21 +306,21 @@ void setup_microenvironment( void )
 	// default_microenvironment_options.calculate_gradients = true; 
 	
 	// set Dirichlet conditions off?
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
+	// default_microenvironment_options.outer_Dirichlet_conditions = true;
 	default_microenvironment_options.outer_Dirichlet_conditions = false;
 
 	// enable tracking (requires 1.5.0 or later)
 	default_microenvironment_options.track_internalized_substrates_in_each_agent = true; 
 	
 	// use this for default Dirichlet conditions. 
-	std::vector<double> bc_vector( 1 , 160  ); // 21% o2
+	// std::vector<double> bc_vector( 1 , 160  ); // 21% o2
 	std::vector<double> zero_vector( 1 , 0.0  ); 
 	// std::vector<double> bc_vector( 1 , 3.42  ); // made up
-	// std::vector<double> bc_vector( 3 , 160  ); // 21% o2
-	// bc_vector[1] = 0.5; 
-	// bc_vector[2] = 0.5; 
+	std::vector<double> bc_vector( 3 , 42  ); // 21% o2
+	bc_vector[1] = 0.0; 
+	bc_vector[2] = 1.0; 
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
-	default_microenvironment_options.Dirichlet_condition_vector = zero_vector;
+	// default_microenvironment_options.Dirichlet_condition_vector = zero_vector;
 	
 	// this is for initial conditions 
 	// default_microenvironment_options.initial_condition_vector = {160.0, 0.5, 0.5}; 
