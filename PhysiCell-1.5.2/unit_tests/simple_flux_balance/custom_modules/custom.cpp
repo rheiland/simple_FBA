@@ -300,6 +300,8 @@ void setup_microenvironment( void )
 	{
 		factor = 1.0 - ((n%20)/20.);
 		bc_vector[0] = factor*38.;
+		bc_vector[1] = 0.;
+		bc_vector[2] = 1.;
 		microenvironment(n) = bc_vector; 
 	}	
 
